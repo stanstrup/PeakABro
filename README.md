@@ -1,2 +1,2 @@
-# PeakBro
-Peaklist annotator and browser
+# PeakABro
+Peaklist Annotator and Browser
