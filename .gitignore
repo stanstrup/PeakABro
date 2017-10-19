@@ -24,7 +24,3 @@ vignettes/*.pdf
 *.knit.md
 .Rproj.user
 PeakABro.Rproj
-
-# Data that maybe protected by license
-inst\extdata\lipidblast_tbl.rds
-inst\extdata\lipidmaps_tbl.rds
