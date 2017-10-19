@@ -23,11 +23,9 @@ expand_adducts <- function(cmp_tbl, mode = "pos", adducts = c("[M+H]+", "[M+Na]+
 
     # make check happy
     name <-
-        adducts <-
         massdiff <-
         charge <-
         nmol <-
-        mode <- 
         mass <-
         NULL
         
