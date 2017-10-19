@@ -18,6 +18,9 @@ Generate table with LipidMaps compounds
 \examples{
 \dontrun{
 lipidmaps_tbl <- generate_lipidmaps_tbl("path/to/LMSDFDownload6Dec16FinalAll.sdf")
+
+# Alternatively get pre-made table from the package
+lipidmaps_tbl2 <- readRDS(system.file("extdata", "lipidmaps_tbl.rds", package="PeakABro"))
 }
 
 
