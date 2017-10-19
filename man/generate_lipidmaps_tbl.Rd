@@ -10,7 +10,7 @@ generate_lipidmaps_tbl(sdf_path)
 \item{sdf_path}{Path to the Lipidmaps SDF file available at: http://www.lipidmaps.org/resources/downloads/}
 }
 \value{
-tbl A \code{\link{tibble}} containing the columns: id, name, inchi, formula, and mass.
+A \code{\link{tibble}} containing the columns: id, name, inchi, formula, and mass.
 }
 \description{
 Generate table with LipidMaps compounds

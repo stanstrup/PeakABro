@@ -10,7 +10,7 @@ generate_lipidblast_tbl(json_path)
 \item{json_path}{Path to the LipidBlast json file available at: http://mona.fiehnlab.ucdavis.edu/downloads}
 }
 \value{
-tbl A \code{\link{tibble}} containing the columns: id, name, inchi, formula, and mass.
+A \code{\link{tibble}} containing the columns: id, name, inchi, formula, and mass.
 }
 \description{
 Generate table with LipidBlast compounds

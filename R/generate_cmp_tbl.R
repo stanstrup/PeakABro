@@ -124,7 +124,7 @@ inchi2mass <- function(inchi){
 #'
 #' @param sdf_path Path to the Lipidmaps SDF file available at: http://www.lipidmaps.org/resources/downloads/
 #'
-#' @return tbl A \code{\link{tibble}} containing the columns: id, name, inchi, formula, and mass.
+#' @return A \code{\link{tibble}} containing the columns: id, name, inchi, formula, and mass.
 # '
 #' @export
 #'
@@ -179,7 +179,7 @@ generate_lipidmaps_tbl <- function(sdf_path){
 #'
 #' @param json_path Path to the LipidBlast json file available at: http://mona.fiehnlab.ucdavis.edu/downloads
 #'
-#' @return tbl A \code{\link{tibble}} containing the columns: id, name, inchi, formula, and mass.
+#' @return A \code{\link{tibble}} containing the columns: id, name, inchi, formula, and mass.
 # '
 #' @export
 #'
