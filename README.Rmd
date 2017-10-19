@@ -4,7 +4,10 @@ output: github_document
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, message=FALSE}
+library(dplyr)
+library(knitr)
+
 knitr::opts_chunk$set(
   collapse = TRUE
 )
@@ -25,27 +28,48 @@ Several compound databases can be downloaded and from and their database format 
 So far I have added functions to extract in from the downloadable LipidMaps and LipidBlast.
 
 * Download the LipidMaps SDF from: http://www.lipidmaps.org/resources/downloads/
-* Download the LipidBlast json from: http://mona.fiehnlab.ucdavis.edu/downloads
-* Adjust path to where you have downloaded the files.
+* Download the LipidBlast json from: http://mona.fiehnlab.ucdavis.edu/downloads (see below; data supplied with package)
+* Adjust path to where you have downloaded the files
 
-```{r, cache=TRUE}
+```{r, cache=FALSE, warning=FALSE}
 library(PeakABro)
+```
+
+```{r, cache=TRUE, warning=FALSE}
 lipidmaps_tbl <- generate_lipidmaps_tbl("inst/extdata/LMSDFDownload6Dec16FinalAll.sdf")
-lipidblast_tbl <- generate_lipidblast_tbl("inst/extdata//MoNA-export-LipidBlast.json")
+# lipidblast_tbl <- generate_lipidblast_tbl("inst/extdata//MoNA-export-LipidBlast.json")
 ```
 
 ```{r, cache=TRUE}
-lipidmaps_tbl
+lipidmaps_tbl %>% slice(1:5) %>% kable
+```
+
+This takes rather long because the databases are quite large. Therefore I try to supply pre-parsed data.
+So far only LipidBlast is available.
+
+```{r, cache=TRUE}
+lipidblast_tbl <- readRDS(system.file("extdata", "lipidblast_tbl.rds", package="PeakABro"))
 ```
 
 ```{r, cache=TRUE}
-lipidblast_tbl
+lipidblast_tbl %>% slice(1:5) %>% kable
 ```
 
-This takes rather long because the databases are quite large. Therefore I have configured
 
-# Alternatively get pre-made table from the package
+## Expand adducts
+
+First we can merge the databases we have.
+
 ```{r, cache=TRUE}
-lipidmaps_tbl2 <-  readRDS(system.file("extdata", "lipidmaps_tbl.rds",  package="PeakABro"))
-lipidblast_tbl2 <- readRDS(system.file("extdata", "lipidblast_tbl.rds", package="PeakABro"))
+cmp_tbl <- bind_rows(lipidblast_tbl, lipidmaps_tbl)
+```
+
+We can then generate tables (positive and negative mode) that has all adducts and fragments we have selected.
+```{r, cache=FALSE, warning=FALSE}
+cmp_tbl_exp_pos <- expand_adducts(cmp_tbl, mode = "pos", adducts = c("[M+H]+", "[M+Na]+", "[2M+H]+", "[M+K]+", "[M+H-H2O]+"))
+cmp_tbl_exp_neg <- expand_adducts(cmp_tbl, mode = "neg", adducts = c("[M-H]-", "[2M-H]-", "[M-2H+Na]-", "[M+Cl]-", "[M-H-H2O]-"))
+
+cmp_tbl_exp <- bind_rows(cmp_tbl_exp_pos, cmp_tbl_exp_neg)
+
+cmp_tbl_exp %>% slice(1:5) %>% kable
 ```
