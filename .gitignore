@@ -28,5 +28,4 @@ PeakABro.Rproj
 # Data that maybe protected by license
 inst/extdata/LMSDFDownload6Dec16FinalAll.sdf
 inst/extdata/MoNA-export-LipidBlast.json
-inst/extdata/lipidblast_tbl.rds
 inst/extdata/lipidmaps_tbl.rds

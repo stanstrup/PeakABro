@@ -82,3 +82,15 @@ cmp_tbl_exp %>% slice(1:5) %>% kable
 | LipidBlast000001 | CerP 24:0; CerP(d14:0/10:0) | InChI=1S/C24H50NO6P/c1-3-5-7-9-11-12-14-15-17-19-23(26)22(21-31-32(28,29)30)25-24(27)20-18-16-13-10-8-6-4-2/h22-23,26H,3-21H2,1-2H3,(H,25,27)(H2,28,29,30)/t22-,23+/m0/s1 | C24H50NO6P |  479.3376| \[M+Na\]+    |       1|     1|  502.3268| pos  |
 | LipidBlast000001 | CerP 24:0; CerP(d14:0/10:0) | InChI=1S/C24H50NO6P/c1-3-5-7-9-11-12-14-15-17-19-23(26)22(21-31-32(28,29)30)25-24(27)20-18-16-13-10-8-6-4-2/h22-23,26H,3-21H2,1-2H3,(H,25,27)(H2,28,29,30)/t22-,23+/m0/s1 | C24H50NO6P |  479.3376| \[M+K\]+     |       1|     1|  518.3007| pos  |
 | LipidBlast000001 | CerP 24:0; CerP(d14:0/10:0) | InChI=1S/C24H50NO6P/c1-3-5-7-9-11-12-14-15-17-19-23(26)22(21-31-32(28,29)30)25-24(27)20-18-16-13-10-8-6-4-2/h22-23,26H,3-21H2,1-2H3,(H,25,27)(H2,28,29,30)/t22-,23+/m0/s1 | C24H50NO6P |  479.3376| \[M+H-H2O\]+ |       1|     1|  462.3343| pos  |
+
+Sources and licenses
+--------------------
+
+-   **LipidBlast**: Downloaded from MassBank of North America (MoNA) <http://mona.fiehnlab.ucdavis.edu/downloads> under the CC BY 4 license.
+-   **LipidMaps**: Downloaded from <http://www.lipidmaps.org/resources/downloads> No data included in this package due to licensing issues.
+
+Journal References
+------------------
+
+-   Kind T, Liu K-H, Lee DY, DeFelice B, Meissen JK, Fiehn O. LipidBlast in silico tandem mass spectrometry database for lipid identification. Nat. Methods. 2013 Aug;10(8):755–8. <http://dx.doi.org/10.1038/nmeth.2551>
+-   Dennis EA, Brown HA, Deems RA, Glass CK, Merrill AH, Murphy RC, et al. The LIPID MAPS Approach to Lipidomics. Funct. Lipidomics. CRC Press; 2005. p. 1–15. <http://dx.doi.org/10.1201/9781420027655.ch1>

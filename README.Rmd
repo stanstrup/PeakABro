@@ -73,3 +73,15 @@ cmp_tbl_exp <- bind_rows(cmp_tbl_exp_pos, cmp_tbl_exp_neg)
 
 cmp_tbl_exp %>% slice(1:5) %>% kable
 ```
+
+
+## Sources and licenses
+* **LipidBlast**: Downloaded from MassBank of North America (MoNA) http://mona.fiehnlab.ucdavis.edu/downloads under the CC BY 4 license.
+* **LipidMaps**: Downloaded from http://www.lipidmaps.org/resources/downloads
+No data included in this package due to licensing issues.
+
+
+## Journal References
+
+* Kind T, Liu K-H, Lee DY, DeFelice B, Meissen JK, Fiehn O. LipidBlast in silico tandem mass spectrometry database for lipid identification. Nat. Methods. 2013 Aug;10(8):755–8. http://dx.doi.org/10.1038/nmeth.2551
+* Dennis EA, Brown HA, Deems RA, Glass CK, Merrill AH, Murphy RC, et al. The LIPID MAPS Approach to Lipidomics. Funct. Lipidomics. CRC Press; 2005. p. 1–15.  http://dx.doi.org/10.1201/9781420027655.ch1
