@@ -18,9 +18,10 @@ knitr::opts_chunk$set(
 Peaklist Annotator and Browser
 
 The purpose of this package is to help identification in metabolomics by:
-1) extracting tables of compounds with their relevant info from different compound database formats
-2) annotating an XCMS (or other) peaklist with the compounds from the compound databases
-3) displaying an interactive browseable peaktable with the annotated compounds in nested tables
+
+1. extracting tables of compounds with their relevant info from different compound database formats
+2. annotating an XCMS (or other) peaklist with the compounds from the compound databases
+3. displaying an interactive browseable peaktable with the annotated compounds in nested tables
 
 ## Get compound tables from databases
 
@@ -41,7 +42,7 @@ lipidmaps_tbl <- generate_lipidmaps_tbl("inst/extdata/LMSDFDownload6Dec16FinalAl
 ```
 
 ```{r, cache=TRUE}
-lipidmaps_tbl %>% slice(1:5) %>% kable
+lipidmaps_tbl %>% slice(1:3) %>% kable
 ```
 
 This takes rather long because the databases are quite large. Therefore I try to supply pre-parsed data.
@@ -52,7 +53,7 @@ lipidblast_tbl <- readRDS(system.file("extdata", "lipidblast_tbl.rds", package="
 ```
 
 ```{r, cache=TRUE}
-lipidblast_tbl %>% slice(1:5) %>% kable
+lipidblast_tbl %>% slice(1:3) %>% kable
 ```
 
 
@@ -71,7 +72,7 @@ cmp_tbl_exp_neg <- expand_adducts(cmp_tbl, mode = "neg", adducts = c("[M-H]-", "
 
 cmp_tbl_exp <- bind_rows(cmp_tbl_exp_pos, cmp_tbl_exp_neg)
 
-cmp_tbl_exp %>% slice(1:5) %>% kable
+cmp_tbl_exp %>% slice(1:3) %>% kable
 ```
 
 
