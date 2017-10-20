@@ -162,6 +162,39 @@ peaklist_anno$anno[[1]] %>% slice(1:3) %>% kable
 | LMFA06000137 | 2E,4E,6Z-Nonatrienal | InChI=1S/C9H12O/c1-2-3-4-5-6-7-8-9-10/h3-9H,2H2,1H3/b4-3-,6-5+,8-7+ | C9H12O  |  136.0888| \[M+H-H2O\]+ |  119.0855|  -4.981859|
 | LMFA06000138 | 2E,4Z,6Z-Nonatrienal | InChI=1S/C9H12O/c1-2-3-4-5-6-7-8-9-10/h3-9H,2H2,1H3/b4-3-,6-5-,8-7+ | C9H12O  |  136.0888| \[M+H-H2O\]+ |  119.0855|  -4.981859|
 
+### Prepare the table for interactive browser
+
+Before we are ready to explore the peaklist interactively there are a few things we need to do and some optional things to fix:
+
+``` r
+library(tidyr)
+
+peaklist_anno_nest <- peaklist_anno %>%
+                        mutate(rt=round(rt/60,2), mz = round(mz,4)) %>% # peaklist rt in minutes and round 
+                        select(mz, rt, isotopes, adduct, anno, pcgroup) %>% # get only relevant info
+                        mutate(anno = map(anno,~ mutate(..1, mz = round(mz, 4), mass = round(mass, 4), ppm = round(ppm,0)))) %>% # round values in annotation tables
+                        nest(-pcgroup, .key = "features") %>% # this is required! We nest the tables by the pcgroup
+                        mutate(avg_rt = map_dbl(features,~round(mean(..1$rt),2))) %>% # extract average mass for each pcgroup
+                        select(pcgroup, avg_rt, features) # putting the nested table last. ATM needed for the browser to work
+    
+```
+
+We are almost there but first we want to add some magic to the table for the interaction (adds + button and View button).
+
+``` r
+peaklist_anno_nest_ready <- peaklist_browser_prep(peaklist_anno_nest, collapse_col = "features", modal_col = "anno")
+```
+
+### interactive browser
+
+Now we can start the browser!
+
+``` r
+peaklist_browser(peaklist_anno_nest_ready, collapse_col = "features", modal_col = "anno")
+```
+
+![Peaklist Browser](inst/peaklist_browser.gif)
+
 Sources and licenses
 --------------------
 

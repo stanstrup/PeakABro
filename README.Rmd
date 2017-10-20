@@ -112,6 +112,39 @@ And one of the nested tables look like this:
 peaklist_anno$anno[[1]] %>% slice(1:3) %>% kable
 ```
 
+### Prepare the table for interactive browser
+
+Before we are ready to explore the peaklist interactively there are a few things we need to do and some optional things to fix:
+
+```{r}
+library(tidyr)
+
+peaklist_anno_nest <- peaklist_anno %>%
+                        mutate(rt=round(rt/60,2), mz = round(mz,4)) %>% # peaklist rt in minutes and round 
+                        select(mz, rt, isotopes, adduct, anno, pcgroup) %>% # get only relevant info
+                        mutate(anno = map(anno,~ mutate(..1, mz = round(mz, 4), mass = round(mass, 4), ppm = round(ppm,0)))) %>% # round values in annotation tables
+                        nest(-pcgroup, .key = "features") %>% # this is required! We nest the tables by the pcgroup
+                        mutate(avg_rt = map_dbl(features,~round(mean(..1$rt),2))) %>% # extract average mass for each pcgroup
+                        select(pcgroup, avg_rt, features) # putting the nested table last. ATM needed for the browser to work
+    
+```
+
+We are almost there but first we want to add some magic to the table for the interaction (adds + button and View button). 
+
+```{r}
+peaklist_anno_nest_ready <- peaklist_browser_prep(peaklist_anno_nest, collapse_col = "features", modal_col = "anno")
+```
+
+### interactive browser
+
+Now we can start the browser!
+
+```{r, eval=FALSE}
+peaklist_browser(peaklist_anno_nest_ready, collapse_col = "features", modal_col = "anno")
+```
+
+![Peaklist Browser](inst/peaklist_browser.gif)
+
 ## Sources and licenses
 * **LipidBlast**: Downloaded from MassBank of North America (MoNA) http://mona.fiehnlab.ucdavis.edu/downloads under the CC BY 4 license.
 * **LipidMaps**: Downloaded from http://www.lipidmaps.org/resources/downloads
