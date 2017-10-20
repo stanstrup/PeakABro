@@ -4,8 +4,9 @@ Peaklist Annotator and Browser
 -   [Get compound tables from databases](#get-compound-tables-from-databases)
 -   [Expand adducts](#expand-adducts)
 -   [Annotate peaklist](#annotate-peaklist)
+-   [Interactive Browser](#interactive-browser)
     -   [Prepare the table for interactive browser](#prepare-the-table-for-interactive-browser)
-    -   [interactive browser](#interactive-browser)
+    -   [Interactively browse peaklist](#interactively-browse-peaklist)
 -   [Sources and licenses](#sources-and-licenses)
 -   [Journal References](#journal-references)
 
@@ -178,6 +179,9 @@ peaklist_anno$anno[[1]] %>% slice(1:3) %>% kable
 
 <br> <br>
 
+Interactive Browser
+===================
+
 Prepare the table for interactive browser
 -----------------------------------------
 
@@ -204,8 +208,8 @@ peaklist_anno_nest_ready <- peaklist_browser_prep(peaklist_anno_nest, collapse_c
 
 <br> <br>
 
-interactive browser
--------------------
+Interactively browse peaklist
+-----------------------------
 
 Now we can start the browser!
 
