@@ -1,18 +1,28 @@
+Peaklist Annotator and Browser
+================
+
+-   [Get compound tables from databases](#get-compound-tables-from-databases)
+-   [Expand adducts](#expand-adducts)
+-   [Annotate peaklist](#annotate-peaklist)
+    -   [Prepare the table for interactive browser](#prepare-the-table-for-interactive-browser)
+    -   [interactive browser](#interactive-browser)
+-   [Sources and licenses](#sources-and-licenses)
+-   [Journal References](#journal-references)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-PeakABro
-========
-
+<title>
 Peaklist Annotator and Browser
-
+</title>
 The purpose of this package is to help identification in metabolomics by:
 
 1.  extracting tables of compounds with their relevant info from different compound database formats
 2.  annotating an XCMS (or other) peaklist with the compounds from the compound databases
 3.  displaying an interactive browseable peaktable with the annotated compounds in nested tables
 
+<br> <br>
+
 Get compound tables from databases
-----------------------------------
+==================================
 
 Several compound databases can be downloaded and from and their database format we can extract a table of relevant information. So far I have added functions to extract in from the downloadable LipidMaps and LipidBlast.
 
@@ -56,8 +66,10 @@ lipidblast_tbl %>% slice(1:3) %>% kable
 | LipidBlast000002 | CerP 26:0; CerP(d14:0/12:0) | InChI=1S/C26H54NO6P/c1-3-5-7-9-11-13-15-17-19-21-25(28)24(23-33-34(30,31)32)27-26(29)22-20-18-16-14-12-10-8-6-4-2/h24-25,28H,3-23H2,1-2H3,(H,27,29)(H2,30,31,32)/t24-,25+/m0/s1       | C26H54NO6P |  507.3689|
 | LipidBlast000003 | CerP 28:0; CerP(d14:0/14:0) | InChI=1S/C28H58NO6P/c1-3-5-7-9-11-13-14-16-18-20-22-24-28(31)29-26(25-35-36(32,33)34)27(30)23-21-19-17-15-12-10-8-6-4-2/h26-27,30H,3-25H2,1-2H3,(H,29,31)(H2,32,33,34)/t26-,27+/m0/s1 | C28H58NO6P |  535.4002|
 
+<br> <br>
+
 Expand adducts
---------------
+==============
 
 First we can merge the databases we have.
 
@@ -82,8 +94,10 @@ cmp_tbl_exp %>% slice(1:3) %>% kable
 | LipidBlast000001 | CerP 24:0; CerP(d14:0/10:0) | InChI=1S/C24H50NO6P/c1-3-5-7-9-11-12-14-15-17-19-23(26)22(21-31-32(28,29)30)25-24(27)20-18-16-13-10-8-6-4-2/h22-23,26H,3-21H2,1-2H3,(H,25,27)(H2,28,29,30)/t22-,23+/m0/s1 | C24H50NO6P |  479.3376| \[2M+H\]+ |       1|     2|  959.6824| pos  |
 | LipidBlast000001 | CerP 24:0; CerP(d14:0/10:0) | InChI=1S/C24H50NO6P/c1-3-5-7-9-11-12-14-15-17-19-23(26)22(21-31-32(28,29)30)25-24(27)20-18-16-13-10-8-6-4-2/h22-23,26H,3-21H2,1-2H3,(H,25,27)(H2,28,29,30)/t22-,23+/m0/s1 | C24H50NO6P |  479.3376| \[M+Na\]+ |       1|     1|  502.3268| pos  |
 
+<br> <br>
+
 Annotate peaklist
------------------
+=================
 
 We ultimately want to use the compound table in an interactive browser so lets remove some redundant info and take only one mode.
 
@@ -162,7 +176,10 @@ peaklist_anno$anno[[1]] %>% slice(1:3) %>% kable
 | LMFA06000137 | 2E,4E,6Z-Nonatrienal | InChI=1S/C9H12O/c1-2-3-4-5-6-7-8-9-10/h3-9H,2H2,1H3/b4-3-,6-5+,8-7+ | C9H12O  |  136.0888| \[M+H-H2O\]+ |  119.0855|  -4.981859|
 | LMFA06000138 | 2E,4Z,6Z-Nonatrienal | InChI=1S/C9H12O/c1-2-3-4-5-6-7-8-9-10/h3-9H,2H2,1H3/b4-3-,6-5-,8-7+ | C9H12O  |  136.0888| \[M+H-H2O\]+ |  119.0855|  -4.981859|
 
-### Prepare the table for interactive browser
+<br> <br>
+
+Prepare the table for interactive browser
+-----------------------------------------
 
 Before we are ready to explore the peaklist interactively there are a few things we need to do and some optional things to fix:
 
@@ -185,7 +202,10 @@ We are almost there but first we want to add some magic to the table for the int
 peaklist_anno_nest_ready <- peaklist_browser_prep(peaklist_anno_nest, collapse_col = "features", modal_col = "anno")
 ```
 
-### interactive browser
+<br> <br>
+
+interactive browser
+-------------------
 
 Now we can start the browser!
 
@@ -195,14 +215,18 @@ peaklist_browser(peaklist_anno_nest_ready, collapse_col = "features", modal_col 
 
 ![Peaklist Browser](inst/peaklist_browser.gif)
 
+<br> <br>
+
 Sources and licenses
---------------------
+====================
 
 -   **LipidBlast**: Downloaded from MassBank of North America (MoNA) <http://mona.fiehnlab.ucdavis.edu/downloads> under the CC BY 4 license.
 -   **LipidMaps**: Downloaded from <http://www.lipidmaps.org/resources/downloads> No data included in this package due to licensing issues.
 
+<br> <br>
+
 Journal References
-------------------
+==================
 
 -   Kind T, Liu K-H, Lee DY, DeFelice B, Meissen JK, Fiehn O. LipidBlast in silico tandem mass spectrometry database for lipid identification. Nat. Methods. 2013 Aug;10(8):755–8. <http://dx.doi.org/10.1038/nmeth.2551>
 -   Dennis EA, Brown HA, Deems RA, Glass CK, Merrill AH, Murphy RC, et al. The LIPID MAPS Approach to Lipidomics. Funct. Lipidomics. CRC Press; 2005. p. 1–15. <http://dx.doi.org/10.1201/9781420027655.ch1>
