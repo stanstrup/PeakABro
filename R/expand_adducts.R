@@ -3,7 +3,7 @@
 #' Expand a table with masses to a table with selected adducts and fragments and their mz values.
 #' This function takes a table with a column mass and calculates the mz value of all selected adducts and fragments.
 #'
-#' @param cmp_tbl data.frame of compounds. The tables should contain a column named "mass".
+#' @param cmp_tbl \code{\link{tibble}} of compounds. The tables should contain a column named "mass".
 #' @param mode A string. Either "pos", "neg" or "ei".
 #' @param adducts Character vector. Any adduct listed in the adduct list found here: https://github.com/stanstrup/chemhelper/tree/master/inst/extdata. Examples: "[M+H]+", "[M+Na]+", "[M-H]-", "[M+Cl]-".
 #'

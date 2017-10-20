@@ -5,7 +5,6 @@ output: github_document
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, echo = FALSE, message=FALSE}
-library(dplyr)
 library(knitr)
 
 knitr::opts_chunk$set(
@@ -32,7 +31,8 @@ So far I have added functions to extract in from the downloadable LipidMaps and 
 * Download the LipidBlast json from: http://mona.fiehnlab.ucdavis.edu/downloads (see below; data supplied with package)
 * Adjust path to where you have downloaded the files
 
-```{r, cache=FALSE, warning=FALSE}
+```{r, cache=FALSE, warning=FALSE, message=FALSE}
+library(dplyr)
 library(PeakABro)
 ```
 
@@ -75,6 +75,42 @@ cmp_tbl_exp <- bind_rows(cmp_tbl_exp_pos, cmp_tbl_exp_neg)
 cmp_tbl_exp %>% slice(1:3) %>% kable
 ```
 
+## Annotate peaklist
+We ultimately want to use the compound table in an interactive browser so lets remove some redundant info and take only one mode.
+
+```{r, warning=FALSE}
+cmp_tbl_exp_pos <- cmp_tbl_exp %>% 
+                   filter(mode=="pos") %>% 
+                   select(-charge, -nmol, -mode)
+                   
+```
+
+Next we load a sample peaklist. I have removed the data columns in this sample.
+
+```{r, warning=FALSE}
+library(readr)
+peaklist <- read_tsv(system.file("extdata", "peaklist_pos.tsv", package="PeakABro"))
+
+peaklist %>% slice(1:3) %>% kable
+```
+
+Now we can annotate the table. 
+The idea here is that each row will have a nested table with annotations from the compound table.
+
+```{r, warning=FALSE}
+library(purrr)
+peaklist_anno <- peaklist %>% mutate(anno = map(mz, cmp_mz_filter, cmp_tbl_exp_pos, ppm=30))
+```
+
+How the peaktable looks like this:
+```{r}
+peaklist_anno %>% select(-mzmin, -mzmax, -rtmin, -rtmax, -npeaks)
+```
+
+And one of the nested tables look like this:
+```{r}
+peaklist_anno$anno[[1]] %>% slice(1:3) %>% kable
+```
 
 ## Sources and licenses
 * **LipidBlast**: Downloaded from MassBank of North America (MoNA) http://mona.fiehnlab.ucdavis.edu/downloads under the CC BY 4 license.

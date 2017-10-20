@@ -21,6 +21,7 @@ Several compound databases can be downloaded and from and their database format 
 -   Adjust path to where you have downloaded the files
 
 ``` r
+library(dplyr)
 library(PeakABro)
 ```
 
@@ -80,6 +81,86 @@ cmp_tbl_exp %>% slice(1:3) %>% kable
 | LipidBlast000001 | CerP 24:0; CerP(d14:0/10:0) | InChI=1S/C24H50NO6P/c1-3-5-7-9-11-12-14-15-17-19-23(26)22(21-31-32(28,29)30)25-24(27)20-18-16-13-10-8-6-4-2/h22-23,26H,3-21H2,1-2H3,(H,25,27)(H2,28,29,30)/t22-,23+/m0/s1 | C24H50NO6P |  479.3376| \[M+H\]+  |       1|     1|  480.3449| pos  |
 | LipidBlast000001 | CerP 24:0; CerP(d14:0/10:0) | InChI=1S/C24H50NO6P/c1-3-5-7-9-11-12-14-15-17-19-23(26)22(21-31-32(28,29)30)25-24(27)20-18-16-13-10-8-6-4-2/h22-23,26H,3-21H2,1-2H3,(H,25,27)(H2,28,29,30)/t22-,23+/m0/s1 | C24H50NO6P |  479.3376| \[2M+H\]+ |       1|     2|  959.6824| pos  |
 | LipidBlast000001 | CerP 24:0; CerP(d14:0/10:0) | InChI=1S/C24H50NO6P/c1-3-5-7-9-11-12-14-15-17-19-23(26)22(21-31-32(28,29)30)25-24(27)20-18-16-13-10-8-6-4-2/h22-23,26H,3-21H2,1-2H3,(H,25,27)(H2,28,29,30)/t22-,23+/m0/s1 | C24H50NO6P |  479.3376| \[M+Na\]+ |       1|     1|  502.3268| pos  |
+
+Annotate peaklist
+-----------------
+
+We ultimately want to use the compound table in an interactive browser so lets remove some redundant info and take only one mode.
+
+``` r
+cmp_tbl_exp_pos <- cmp_tbl_exp %>% 
+                   filter(mode=="pos") %>% 
+                   select(-charge, -nmol, -mode)
+                   
+```
+
+Next we load a sample peaklist. I have removed the data columns in this sample.
+
+``` r
+library(readr)
+peaklist <- read_tsv(system.file("extdata", "peaklist_pos.tsv", package="PeakABro"))
+## Parsed with column specification:
+## cols(
+##   mz = col_double(),
+##   mzmin = col_double(),
+##   mzmax = col_double(),
+##   rt = col_double(),
+##   rtmin = col_double(),
+##   rtmax = col_double(),
+##   npeaks = col_integer(),
+##   isotopes = col_character(),
+##   adduct = col_character(),
+##   pcgroup = col_integer()
+## )
+
+peaklist %>% slice(1:3) %>% kable
+```
+
+|        mz|     mzmin|     mzmax|        rt|     rtmin|     rtmax|  npeaks| isotopes | adduct               |  pcgroup|
+|---------:|---------:|---------:|---------:|---------:|---------:|-------:|:---------|:---------------------|--------:|
+|  119.0861|  119.0856|  119.0873|  480.2640|  479.7749|  480.6898|      83| NA       | NA                   |       48|
+|  129.0548|  129.0544|  129.0552|  682.1079|  681.5382|  682.5982|      94| NA       | \[M+H-H2O\]+ 146.058 |       10|
+|  147.0654|  147.0649|  147.0657|  682.1068|  681.5382|  682.5982|      84| NA       | \[M+H\]+ 146.058     |       10|
+
+Now we can annotate the table. The idea here is that each row will have a nested table with annotations from the compound table.
+
+``` r
+library(purrr)
+peaklist_anno <- peaklist %>% mutate(anno = map(mz, cmp_mz_filter, cmp_tbl_exp_pos, ppm=30))
+```
+
+How the peaktable looks like this:
+
+``` r
+peaklist_anno %>% select(-mzmin, -mzmax, -rtmin, -rtmax, -npeaks)
+## # A tibble: 49 x 6
+##          mz       rt   isotopes
+##       <dbl>    <dbl>      <chr>
+##  1 119.0861 480.2640       <NA>
+##  2 129.0548 682.1079       <NA>
+##  3 147.0654 682.1068       <NA>
+##  4 247.2419 796.0284       <NA>
+##  5 259.1905 682.0464       <NA>
+##  6 265.2527 795.9556   [31][M]+
+##  7 266.2557 795.9540 [31][M+1]+
+##  8 308.2944 796.7262       <NA>
+##  9 321.2777 796.0501       <NA>
+## 10 339.3451 795.8738       <NA>
+## # ... with 39 more rows, and 3 more variables: adduct <chr>,
+## #   pcgroup <int>, anno <list>
+```
+
+And one of the nested tables look like this:
+
+``` r
+peaklist_anno$anno[[1]] %>% slice(1:3) %>% kable
+```
+
+| id           | name                 | inchi                                                               | formula |      mass| adduct       |        mz|        ppm|
+|:-------------|:---------------------|:--------------------------------------------------------------------|:--------|---------:|:-------------|---------:|----------:|
+| LMFA06000136 | 2E,4E,6E-Nonatrienal | InChI=1S/C9H12O/c1-2-3-4-5-6-7-8-9-10/h3-9H,2H2,1H3/b4-3+,6-5+,8-7+ | C9H12O  |  136.0888| \[M+H-H2O\]+ |  119.0855|  -4.981859|
+| LMFA06000137 | 2E,4E,6Z-Nonatrienal | InChI=1S/C9H12O/c1-2-3-4-5-6-7-8-9-10/h3-9H,2H2,1H3/b4-3-,6-5+,8-7+ | C9H12O  |  136.0888| \[M+H-H2O\]+ |  119.0855|  -4.981859|
+| LMFA06000138 | 2E,4Z,6Z-Nonatrienal | InChI=1S/C9H12O/c1-2-3-4-5-6-7-8-9-10/h3-9H,2H2,1H3/b4-3-,6-5-,8-7+ | C9H12O  |  136.0888| \[M+H-H2O\]+ |  119.0855|  -4.981859|
 
 Sources and licenses
 --------------------

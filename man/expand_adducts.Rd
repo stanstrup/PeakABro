@@ -8,7 +8,7 @@ expand_adducts(cmp_tbl, mode = "pos", adducts = c("[M+H]+", "[M+Na]+",
   "[2M+H]+", "[M+K]+", "[M+H-H2O]+"))
 }
 \arguments{
-\item{cmp_tbl}{data.frame of compounds. The tables should contain a column named "mass".}
+\item{cmp_tbl}{\code{\link{tibble}} of compounds. The tables should contain a column named "mass".}
 
 \item{mode}{A string. Either "pos", "neg" or "ei".}
 
