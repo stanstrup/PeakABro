@@ -236,7 +236,7 @@ peaklist_browser <- function(peaklist, collapse_col, modal_col){
       
       
     
-      output$my_table <- renderDataTable(my_data(),
+      output$my_table <- DT::renderDataTable(my_data(),
                                              options = list(columnDefs = list(
                                                                                 list(visible = FALSE, targets = c(collapse_col_idx-1) ), # Hide row numbers and nested columns
                                                                                 list(orderable = FALSE, className = 'details-control', targets = 0) # turn first column into control column
@@ -274,7 +274,7 @@ peaklist_browser <- function(peaklist, collapse_col, modal_col){
                                           "",
                                           size = "large",
                                           column(12, 
-                                                 renderDataTable(DataRow(),
+                                                 DT::renderDataTable(DataRow(),
                                                                      escape = -c(3,4), # escape name and inchi column
                                                                      filter="top",
                                                                      selection = "none"
