@@ -41,6 +41,7 @@ We use the new package [CompoundDb](https://github.com/EuracBiomedicalResearch)
 library(dplyr)
 library(PeakABro)
 library(CompoundDb)
+library(shinyBS) # for some reason explicit loading is required.
 ```
 
 ```{r, cache=TRUE, warning=FALSE}
@@ -197,6 +198,7 @@ peaklist_anno_nest_ready <- peaklist_browser_prep(peaklist_anno_nest, collapse_c
 ## Interactively browse peaklist
 
 Now we can start the browser!
+You need to use a proper browser like chrome. Not the RStudio browser.
 
 ```{r, eval=FALSE}
 peaklist_browser(peaklist_anno_nest_ready, collapse_col = "features", modal_col = "anno")
