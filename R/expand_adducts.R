@@ -11,7 +11,7 @@
 #' 
 #' @export
 #'
-#' @importFrom chemhelper load.camera.rules
+#' @importFrom commonMZ MZ_CAMERA
 #' @importFrom tibble data_frame
 #' @importFrom tidyr unnest
 #' @importFrom dplyr filter select bind_cols mutate
@@ -29,7 +29,7 @@ expand_adducts <- function(cmp_tbl, mode = "pos", adducts = c("[M+H]+", "[M+Na]+
         mass <-
         NULL
         
-    rules <- load.camera.rules(mode)
+    rules <- MZ_CAMERA(mode, warn_clash = FALSE)
     rules %<>% filter(name %in% adducts) %>% 
                select(adduct = name, massdiff, charge, nmol)
     
