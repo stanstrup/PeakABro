@@ -31,7 +31,9 @@ Imports:
     shinyBS
 Suggests: 
     knitr,
-    readr
+    readr,
+    devtools,
+    CompoundDb
 License: GPL (>= 2)
 URL: None
 biocViews: MassSpectrometry, Metabolomics

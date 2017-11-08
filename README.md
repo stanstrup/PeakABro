@@ -11,47 +11,79 @@ Peaklist Annotator and Browser
 -   [Journal References](#journal-references)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-<title>
-Peaklist Annotator and Browser
-</title>
 The purpose of this package is to help identification in metabolomics by:
 
-1.  extracting tables of compounds with their relevant info from different compound database formats
-2.  annotating an XCMS (or other) peaklist with the compounds from the compound databases
-3.  displaying an interactive browseable peaktable with the annotated compounds in nested tables
+1.  annotating an XCMS (or other) peaklist with the compounds from the compound databases
+2.  displaying an interactive browseable peaktable with the annotated compounds in nested tables
+
+This package is in an early alpha stage. It will need to integrate better with [CompoundDb](https://github.com/EuracBiomedicalResearch) and require less "manual" data wrangling. Will also be better when the database files can be made avaialable directly.
 
 <br> <br>
 
 Get compound tables from databases
 ==================================
 
-Several compound databases can be downloaded and from and their database format we can extract a table of relevant information. So far I have added functions to extract in from the downloadable LipidMaps and LipidBlast.
-
--   Download the LipidMaps SDF from: <http://www.lipidmaps.org/resources/downloads/>
--   Download the LipidBlast json from: <http://mona.fiehnlab.ucdavis.edu/downloads> (see below; data supplied with package)
--   Adjust path to where you have downloaded the files
+We use the new package [CompoundDb](https://github.com/EuracBiomedicalResearch)
 
 ``` r
 library(dplyr)
 library(PeakABro)
+library(CompoundDb)
 ```
 
 ``` r
-lipidmaps_tbl <- generate_lipidmaps_tbl("inst/extdata/LMSDFDownload6Dec16FinalAll.sdf")
-# lipidblast_tbl <- generate_lipidblast_tbl("inst/extdata//MoNA-export-LipidBlast.json")
+# Read the HMDB SDF file.
+# You need to download this from the HMDB website.
+hmdb_tab <- compound_tbl_sdf("inst/extdata/HMDB.sdf")
+
+
+hmdb_meta <- make_metadata(source = "HMDB", 
+                           url = "http://www.hmdb.ca",
+                           source_version = "4.0", 
+                           source_date = "2017-09-10",
+                           organism = "Hsapiens"
+                           )
+
+
+hmdb_db <- createCompDb(hmdb_tab, metadata = hmdb_meta, path = tempdir())
 ```
+
+Now we can craete our own package with this data and install it. You only need to do this once.
 
 ``` r
-lipidmaps_tbl %>% slice(1:3) %>% kable
+createCompDbPackage(
+    hmdb_db, 
+    version = "0.0.1", 
+    author = "Jan Stanstrup", 
+    path = tempdir(),
+    maintainer = "Jan Stanstrup <stanstrup@gmail.com>"
+)
+## Creating package in C:\Users\tmh331\AppData\Local\Temp\RtmpuglabL/CompDb.Hsapiens.HMDB.4.0
+
+
+library(devtools)
+install_local(paste0(tempdir(),"/CompDb.Hsapiens.HMDB.4.0"))
 ```
 
-| id           | name                                                                | inchi                                                                                                                                                                                                        | formula    |      mass|
-|:-------------|:--------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------|---------:|
-| LMFA00000001 | cetylenic acids; 2-methoxy-12-methyloctadec-17-en-5-ynoyl anhydride | InChI=1S/C40H66O5/c1-7-9-11-23-29-35(3)31-25-19-15-13-17-21-27-33-37(43-5)39(41)45-40(42)38(44-6)34-28-22-18-14-16-20-26-32-36(4)30-24-12-10-8-2/h7-8,35-38H,1-2,9-16,19-20,23-34H2,3-6H3                    | C40H66O5   |  626.4910|
-| LMFA00000002 | Serratamic acid; N-(3S-hydroxydecanoyl)-L-serine                    | InChI=1S/C13H25NO5/c1-2-3-4-5-6-7-10(16)8-12(17)14-11(9-15)13(18)19/h10-11,15-16H,2-9H2,1H3,(H,14,17)(H,18,19)/t10-,11-/m0/s1                                                                                | C13H25NO5  |  275.1733|
-| LMFA00000003 | N-(3-(hexadecanoyloxy)-heptadecanoyl)-L-ornithine                   | InChI=1S/C38H74N2O5/c1-3-5-7-9-11-13-15-17-19-21-23-25-27-31-37(42)45-34(33-36(41)40-35(38(43)44)30-28-32-39)29-26-24-22-20-18-16-14-12-10-8-6-4-2/h34-35H,3-33,39H2,1-2H3,(H,40,41)(H,43,44)/t34?,35-/m0/s1 | C38H74N2O5 |  638.5598|
+Now we can load this package and get the data.
 
-This takes rather long because the databases are quite large. Therefore I try to supply pre-parsed data. So far only LipidBlast is available.
+``` r
+library(CompDb.Hsapiens.HMDB.4.0)
+
+HMDB_tbl <- compounds(CompDb.Hsapiens.HMDB.4.0, return.type = "tibble")
+
+HMDB_tbl %>% 
+    slice(1:3) %>% 
+    kable
+```
+
+| compound\_id | compound\_name     | inchi                                                                                   | formula   |      mass|
+|:-------------|:-------------------|:----------------------------------------------------------------------------------------|:----------|---------:|
+| HMDB0000001  | 1-Methylhistidine  | InChI=1S/C7H11N3O2/c1-10-3-5(9-4-10)2-6(8)7(11)12/h3-4,6H,2,8H2,1H3,(H,11,12)/t6-/m0/s1 | C7H11N3O2 |  169.0851|
+| HMDB0000002  | 1,3-Diaminopropane | InChI=1S/C3H10N2/c4-2-1-3-5/h1-5H2                                                      | C3H10N2   |   74.0844|
+| HMDB0000005  | 2-Ketobutyric acid | InChI=1S/C4H6O3/c1-2-3(5)4(6)7/h2H2,1H3,(H,6,7)                                         | C4H6O3    |  102.0317|
+
+This takes rather long because the databases are quite large. Therefore I try to supply pre-parsed data. So far only LipidBlast is available. This will be moved to a seperate package shortly (also there seems to be a bug in LipidBlast ATM that causes wrong info).
 
 ``` r
 lipidblast_tbl <- readRDS(system.file("extdata", "lipidblast_tbl.rds", package="PeakABro"))
@@ -72,28 +104,19 @@ lipidblast_tbl %>% slice(1:3) %>% kable
 Expand adducts
 ==============
 
-First we can merge the databases we have.
+Lets use only HMDB for now.
 
 ``` r
-cmp_tbl <- bind_rows(lipidblast_tbl, lipidmaps_tbl)
+cmp_tbl_exp_pos <- expand_adducts(HMDB_tbl, mode = "pos", adducts = c("[M+H]+", "[M+Na]+", "[2M+H]+", "[M+K]+", "[M+H-H2O]+"))
+
+cmp_tbl_exp_pos %>% slice(1:3) %>% kable
 ```
 
-We can then generate tables (positive and negative mode) that has all adducts and fragments we have selected.
-
-``` r
-cmp_tbl_exp_pos <- expand_adducts(cmp_tbl, mode = "pos", adducts = c("[M+H]+", "[M+Na]+", "[2M+H]+", "[M+K]+", "[M+H-H2O]+"))
-cmp_tbl_exp_neg <- expand_adducts(cmp_tbl, mode = "neg", adducts = c("[M-H]-", "[2M-H]-", "[M-2H+Na]-", "[M+Cl]-", "[M-H-H2O]-"))
-
-cmp_tbl_exp <- bind_rows(cmp_tbl_exp_pos, cmp_tbl_exp_neg)
-
-cmp_tbl_exp %>% slice(1:3) %>% kable
-```
-
-| id               | name                        | inchi                                                                                                                                                                     | formula    |      mass| adduct    |  charge|  nmol|        mz| mode |
-|:-----------------|:----------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------|---------:|:----------|-------:|-----:|---------:|:-----|
-| LipidBlast000001 | CerP 24:0; CerP(d14:0/10:0) | InChI=1S/C24H50NO6P/c1-3-5-7-9-11-12-14-15-17-19-23(26)22(21-31-32(28,29)30)25-24(27)20-18-16-13-10-8-6-4-2/h22-23,26H,3-21H2,1-2H3,(H,25,27)(H2,28,29,30)/t22-,23+/m0/s1 | C24H50NO6P |  479.3376| \[M+H\]+  |       1|     1|  480.3449| pos  |
-| LipidBlast000001 | CerP 24:0; CerP(d14:0/10:0) | InChI=1S/C24H50NO6P/c1-3-5-7-9-11-12-14-15-17-19-23(26)22(21-31-32(28,29)30)25-24(27)20-18-16-13-10-8-6-4-2/h22-23,26H,3-21H2,1-2H3,(H,25,27)(H2,28,29,30)/t22-,23+/m0/s1 | C24H50NO6P |  479.3376| \[2M+H\]+ |       1|     2|  959.6824| pos  |
-| LipidBlast000001 | CerP 24:0; CerP(d14:0/10:0) | InChI=1S/C24H50NO6P/c1-3-5-7-9-11-12-14-15-17-19-23(26)22(21-31-32(28,29)30)25-24(27)20-18-16-13-10-8-6-4-2/h22-23,26H,3-21H2,1-2H3,(H,25,27)(H2,28,29,30)/t22-,23+/m0/s1 | C24H50NO6P |  479.3376| \[M+Na\]+ |       1|     1|  502.3268| pos  |
+| compound\_id | compound\_name    | inchi                                                                                   | formula   |      mass| adduct    |  charge|  nmol|        mz| mode |
+|:-------------|:------------------|:----------------------------------------------------------------------------------------|:----------|---------:|:----------|-------:|-----:|---------:|:-----|
+| HMDB0000001  | 1-Methylhistidine | InChI=1S/C7H11N3O2/c1-10-3-5(9-4-10)2-6(8)7(11)12/h3-4,6H,2,8H2,1H3,(H,11,12)/t6-/m0/s1 | C7H11N3O2 |  169.0851| \[M+H\]+  |       1|     1|  170.0924| pos  |
+| HMDB0000001  | 1-Methylhistidine | InChI=1S/C7H11N3O2/c1-10-3-5(9-4-10)2-6(8)7(11)12/h3-4,6H,2,8H2,1H3,(H,11,12)/t6-/m0/s1 | C7H11N3O2 |  169.0851| \[2M+H\]+ |       1|     2|  339.1775| pos  |
+| HMDB0000001  | 1-Methylhistidine | InChI=1S/C7H11N3O2/c1-10-3-5(9-4-10)2-6(8)7(11)12/h3-4,6H,2,8H2,1H3,(H,11,12)/t6-/m0/s1 | C7H11N3O2 |  169.0851| \[M+Na\]+ |       1|     1|  192.0743| pos  |
 
 <br> <br>
 
@@ -103,8 +126,8 @@ Annotate peaklist
 We ultimately want to use the compound table in an interactive browser so lets remove some redundant info and take only one mode.
 
 ``` r
-cmp_tbl_exp_pos <- cmp_tbl_exp %>% 
-                   filter(mode=="pos") %>% 
+cmp_tbl_exp_pos <- cmp_tbl_exp_pos %>% 
+                   filter(mode=="pos") %>% # if you generated also neg above
                    select(-charge, -nmol, -mode)
                    
 ```
@@ -171,11 +194,11 @@ And one of the nested tables look like this:
 peaklist_anno$anno[[1]] %>% slice(1:3) %>% kable
 ```
 
-| id           | name                 | inchi                                                               | formula |      mass| adduct       |        mz|        ppm|
-|:-------------|:---------------------|:--------------------------------------------------------------------|:--------|---------:|:-------------|---------:|----------:|
-| LMFA06000136 | 2E,4E,6E-Nonatrienal | InChI=1S/C9H12O/c1-2-3-4-5-6-7-8-9-10/h3-9H,2H2,1H3/b4-3+,6-5+,8-7+ | C9H12O  |  136.0888| \[M+H-H2O\]+ |  119.0855|  -4.981859|
-| LMFA06000137 | 2E,4E,6Z-Nonatrienal | InChI=1S/C9H12O/c1-2-3-4-5-6-7-8-9-10/h3-9H,2H2,1H3/b4-3-,6-5+,8-7+ | C9H12O  |  136.0888| \[M+H-H2O\]+ |  119.0855|  -4.981859|
-| LMFA06000138 | 2E,4Z,6Z-Nonatrienal | InChI=1S/C9H12O/c1-2-3-4-5-6-7-8-9-10/h3-9H,2H2,1H3/b4-3-,6-5-,8-7+ | C9H12O  |  136.0888| \[M+H-H2O\]+ |  119.0855|  -4.981859|
+| compound\_id | compound\_name        | inchi                                                   | formula |      mass| adduct       |        mz|        ppm|
+|:-------------|:----------------------|:--------------------------------------------------------|:--------|---------:|:-------------|---------:|----------:|
+| HMDB0029579  | Diisopropyl sulfide   | InChI=1S/C6H14S/c1-5(2)7-6(3)4/h5-6H,1-4H3              | C6H14S  |  118.0816| \[M+H\]+     |  119.0889|  23.323984|
+| HMDB0029667  | 2,3,6-Trimethylphenol | InChI=1S/C9H12O/c1-6-4-5-7(2)9(10)8(6)3/h4-5,10H,1-3H3  | C9H12O  |  136.0888| \[M+H-H2O\]+ |  119.0855|  -4.981809|
+| HMDB0031312  | Benzyl ethyl ether    | InChI=1S/C9H12O/c1-2-10-8-9-6-4-3-5-7-9/h3-7H,2,8H2,1H3 | C9H12O  |  136.0888| \[M+H-H2O\]+ |  119.0855|  -4.981809|
 
 <br> <br>
 
@@ -189,6 +212,7 @@ Before we are ready to explore the peaklist interactively there are a few things
 
 ``` r
 library(tidyr)
+## Warning: package 'tidyr' was built under R version 3.4.2
 
 peaklist_anno_nest <- peaklist_anno %>%
                         mutate(rt=round(rt/60,2), mz = round(mz,4)) %>% # peaklist rt in minutes and round 

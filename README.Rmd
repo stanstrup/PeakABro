@@ -17,42 +17,86 @@ knitr::opts_chunk$set(
 ```
 
 
-<title>Peaklist Annotator and Browser</title>
-
 The purpose of this package is to help identification in metabolomics by:
 
-1. extracting tables of compounds with their relevant info from different compound database formats
-2. annotating an XCMS (or other) peaklist with the compounds from the compound databases
-3. displaying an interactive browseable peaktable with the annotated compounds in nested tables
+1. annotating an XCMS (or other) peaklist with the compounds from the compound 
+databases
+2. displaying an interactive browseable peaktable with the annotated compounds 
+in nested tables
+
+
+This package is in an early alpha stage. It will need to integrate better with
+[CompoundDb](https://github.com/EuracBiomedicalResearch) and require less 
+"manual" data wrangling.
+Will also be better when the database files can be made avaialable directly.
 
 <br>
 <br>
 
 # Get compound tables from databases
 
-Several compound databases can be downloaded and from and their database format we can extract a table of relevant information.
-So far I have added functions to extract in from the downloadable LipidMaps and LipidBlast.
-
-* Download the LipidMaps SDF from: http://www.lipidmaps.org/resources/downloads/
-* Download the LipidBlast json from: http://mona.fiehnlab.ucdavis.edu/downloads (see below; data supplied with package)
-* Adjust path to where you have downloaded the files
+We use the new package [CompoundDb](https://github.com/EuracBiomedicalResearch)
 
 ```{r, cache=FALSE, warning=FALSE, message=FALSE}
 library(dplyr)
 library(PeakABro)
+library(CompoundDb)
 ```
 
 ```{r, cache=TRUE, warning=FALSE}
-lipidmaps_tbl <- generate_lipidmaps_tbl("inst/extdata/LMSDFDownload6Dec16FinalAll.sdf")
-# lipidblast_tbl <- generate_lipidblast_tbl("inst/extdata//MoNA-export-LipidBlast.json")
+# Read the HMDB SDF file.
+# You need to download this from the HMDB website.
+hmdb_tab <- compound_tbl_sdf("inst/extdata/HMDB.sdf")
+
+
+hmdb_meta <- make_metadata(source = "HMDB", 
+                           url = "http://www.hmdb.ca",
+                           source_version = "4.0", 
+                           source_date = "2017-09-10",
+                           organism = "Hsapiens"
+                           )
+
+
+hmdb_db <- createCompDb(hmdb_tab, metadata = hmdb_meta, path = tempdir())
 ```
 
-```{r, cache=TRUE}
-lipidmaps_tbl %>% slice(1:3) %>% kable
+
+Now we can craete our own package with this data and install it. 
+You only need to do this once.
+
+```{r, cache=TRUE, warning=FALSE, message=FALSE}
+createCompDbPackage(
+    hmdb_db, 
+    version = "0.0.1", 
+    author = "Jan Stanstrup", 
+    path = tempdir(),
+    maintainer = "Jan Stanstrup <stanstrup@gmail.com>"
+)
+
+
+library(devtools)
+install_local(paste0(tempdir(),"/CompDb.Hsapiens.HMDB.4.0"))
 ```
 
-This takes rather long because the databases are quite large. Therefore I try to supply pre-parsed data.
+
+Now we can load this package and get the data.
+
+```{r, cache=TRUE, warning=FALSE}
+library(CompDb.Hsapiens.HMDB.4.0)
+
+HMDB_tbl <- compounds(CompDb.Hsapiens.HMDB.4.0, return.type = "tibble")
+
+HMDB_tbl %>% 
+    slice(1:3) %>% 
+    kable
+```
+
+
+This takes rather long because the databases are quite large. 
+Therefore I try to supply pre-parsed data.
 So far only LipidBlast is available.
+This will be moved to a seperate package shortly 
+(also there seems to be a bug in LipidBlast ATM that causes wrong info).
 
 ```{r, cache=TRUE}
 lipidblast_tbl <- readRDS(system.file("extdata", "lipidblast_tbl.rds", package="PeakABro"))
@@ -69,20 +113,14 @@ lipidblast_tbl %>% slice(1:3) %>% kable
 
 # Expand adducts
 
-First we can merge the databases we have.
+Lets use only HMDB for now.
 
-```{r, cache=TRUE}
-cmp_tbl <- bind_rows(lipidblast_tbl, lipidmaps_tbl)
-```
 
-We can then generate tables (positive and negative mode) that has all adducts and fragments we have selected.
+
 ```{r, cache=FALSE, warning=FALSE}
-cmp_tbl_exp_pos <- expand_adducts(cmp_tbl, mode = "pos", adducts = c("[M+H]+", "[M+Na]+", "[2M+H]+", "[M+K]+", "[M+H-H2O]+"))
-cmp_tbl_exp_neg <- expand_adducts(cmp_tbl, mode = "neg", adducts = c("[M-H]-", "[2M-H]-", "[M-2H+Na]-", "[M+Cl]-", "[M-H-H2O]-"))
+cmp_tbl_exp_pos <- expand_adducts(HMDB_tbl, mode = "pos", adducts = c("[M+H]+", "[M+Na]+", "[2M+H]+", "[M+K]+", "[M+H-H2O]+"))
 
-cmp_tbl_exp <- bind_rows(cmp_tbl_exp_pos, cmp_tbl_exp_neg)
-
-cmp_tbl_exp %>% slice(1:3) %>% kable
+cmp_tbl_exp_pos %>% slice(1:3) %>% kable
 ```
 
 
@@ -93,8 +131,8 @@ cmp_tbl_exp %>% slice(1:3) %>% kable
 We ultimately want to use the compound table in an interactive browser so lets remove some redundant info and take only one mode.
 
 ```{r, warning=FALSE}
-cmp_tbl_exp_pos <- cmp_tbl_exp %>% 
-                   filter(mode=="pos") %>% 
+cmp_tbl_exp_pos <- cmp_tbl_exp_pos %>% 
+                   filter(mode=="pos") %>% # if you generated also neg above
                    select(-charge, -nmol, -mode)
                    
 ```
